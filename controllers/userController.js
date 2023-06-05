@@ -110,7 +110,8 @@ const loginUser_post = async (req, res) => {
   //  jwt cookie send // sending the cookie from here
   const token = createToken(user._id);
 
-  res.cookie("jwt", token, { maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
+  // res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
+  res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
 
   // sending a cookie response ..
   // res.cookie("Hi", true);
