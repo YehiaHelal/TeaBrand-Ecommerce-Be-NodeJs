@@ -14,6 +14,8 @@ const requireAuth = async (req, res, next) => {
     token = req.cookies.jwt;
   }
 
+  console.log(req.cookies);
+
   if (!token) {
     return res
       .status(401)
