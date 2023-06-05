@@ -46,7 +46,6 @@ app.use(
   cors({
     credentials: true,
     origin: "https://zippy-horse-78b7b7.netlify.app",
-    // origin: true,
   })
 );
 

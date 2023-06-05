@@ -123,16 +123,16 @@ const loginUser_post = async (req, res) => {
       httpOnly: true,
       maxAge: maxAge * 1000,
       secure: false,
-      // domain: "https://zippy-horse-78b7b7.netlify.app",
+      domain: "https://zippy-horse-78b7b7.netlify.app",
     })
-    .json();
+    .json({ user: user.email, token });
 
   // sending a cookie response ..
   // res.cookie("Hi", true);
 
   // after we send a jwt token for the browser-frontend
   // send the token and user email as data from here
-  res.status(200).json({ user: user.email, token });
+  // res.status(200).json({ user: user.email, token });
 };
 
 const profileDataGet_post = async (req, res) => {
