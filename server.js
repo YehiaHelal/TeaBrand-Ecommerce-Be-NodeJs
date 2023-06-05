@@ -42,13 +42,15 @@ app.use((req, res, next) => {
 });
 
 app.use(cookieParser()); // To parse the incoming cookies
-app.use(
-  cors({
-    credentials: true,
-    // origin: "https://tea-brand-ecommerce-fe-nextjs.vercel.app",
-    origin: "*",
-  })
-);
+// app.use(
+//   cors({
+//     credentials: true,
+//     // origin: "https://tea-brand-ecommerce-fe-nextjs.vercel.app",
+//     origin: "*",
+//   })
+// );
+
+app.use(cors());
 app.use(fileUpload());
 
 ///////////////////////////////////////
