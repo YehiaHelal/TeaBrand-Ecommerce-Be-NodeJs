@@ -110,27 +110,19 @@ const loginUser_post = async (req, res) => {
   //  jwt cookie send // sending the cookie from here
   const token = createToken(user._id);
 
-  // res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
+  res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
   // res.cookie("jwt", token, {
   //   httpOnly: true,
   //   maxAge: maxAge * 1000,
   //   // sameSite: "none",
   // }); // this maxAge is in milisecond while jwt is in seconds maxage
 
-  res
-    .status(200)
-    .cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: maxAge * 1000,
-    })
-    .json({ user: user.email, token });
-
   // sending a cookie response ..
   // res.cookie("Hi", true);
 
   // after we send a jwt token for the browser-frontend
   // send the token and user email as data from here
-  // res.status(200).json({ user: user.email, token });
+  res.status(200).json({ user: user.email, token });
 };
 
 const profileDataGet_post = async (req, res) => {
