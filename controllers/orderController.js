@@ -346,9 +346,9 @@ const resizeItemPhoto = async (req, res, next) => {
   // console.log(semiTransparentRedPng);
 
   AWS.config.update({
-    accessKeyId: "AKIAUPPI63HIR2RBYPKV",
-    secretAccessKey: "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",
-    region: "eu-north-1",
+    accessKeyId: process.env.accessKeyId,
+    secretAccessKey: process.env.secretAccessKey,
+    region: process.env.region,
   });
 
   const s3 = new AWS.S3();

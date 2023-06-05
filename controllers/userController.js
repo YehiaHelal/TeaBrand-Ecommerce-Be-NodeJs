@@ -290,9 +290,9 @@ const resizeUserPhoto = async (req, res, next) => {
   // console.log(semiTransparentRedPng);
 
   AWS.config.update({
-    accessKeyId: "AKIAUPPI63HIR2RBYPKV",
-    secretAccessKey: "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",
-    region: "eu-north-1",
+    accessKeyId: process.env.accessKeyId,
+    secretAccessKey: process.env.secretAccessKey,
+    region: process.env.region,
   });
 
   const s3 = new AWS.S3();
@@ -366,9 +366,9 @@ const resizeUserPhoto = async (req, res, next) => {
 //   console.log(semiTransparentRedPng);
 
 //   AWS.config.update({
-//     accessKeyId: "AKIAUPPI63HIR2RBYPKV",
-//     secretAccessKey: "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",
-//     region: "eu-north-1",
+//      accessKeyId: process.env.accessKeyId,
+// secretAccessKey: process.env.secretAccessKey,
+// region: process.env.region,
 //   });
 
 //   const s3 = new AWS.S3();
@@ -442,9 +442,9 @@ const resizeUserPhoto = async (req, res, next) => {
 //   res.status(200).json({ message: "done" });
 
 //   // AWS.config.update({
-//   //   accessKeyId: "AKIAUPPI63HIR2RBYPKV",
-//   //   secretAccessKey: "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",
-//   //   region: "eu-north-1",
+//   accessKeyId: process.env.accessKeyId,
+// secretAccessKey: process.env.secretAccessKey,
+// region: process.env.region,
 //   // });
 
 //   // const s3 = new AWS.S3();
@@ -474,17 +474,6 @@ const resizeUserPhoto = async (req, res, next) => {
 //   //   // }).listen(8124)
 //   //   // console.log('Server running at http://localhost:8124/')
 //   //   console.log(image);
-//   // });
-
-//   // const client = new S3Client({
-//   //   region: "eu-north-1",
-//   //   credentials: {
-//   //     accessKeyId: "AKIAUPPI63HIR2RBYPKV",
-//   //     secretAccessKey: "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",
-//   //     Body: fileContent,
-//   //     ACL: "public-read",
-//   //     ContentType: "",
-//   //   },
 //   // });
 
 //   // res.send({ data: "loading" });
