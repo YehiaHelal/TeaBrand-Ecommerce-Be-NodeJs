@@ -122,6 +122,7 @@ const loginUser_post = async (req, res) => {
     .cookie("jwt", token, {
       httpOnly: true,
       maxAge: maxAge * 1000,
+      secure: false,
       // domain: "https://zippy-horse-78b7b7.netlify.app",
     })
     .json();
