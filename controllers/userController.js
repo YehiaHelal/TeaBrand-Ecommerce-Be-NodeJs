@@ -122,7 +122,7 @@ const loginUser_post = async (req, res) => {
     .cookie("jwt", token, {
       httpOnly: true,
       maxAge: maxAge * 1000,
-      domain: "https://tea-brand-ecommerce-fe-nextjs.vercel.app",
+      // domain: "https://tea-brand-ecommerce-fe-nextjs.vercel.app",
     })
     .json();
 
