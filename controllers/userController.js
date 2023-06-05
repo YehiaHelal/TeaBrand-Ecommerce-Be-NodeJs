@@ -111,7 +111,21 @@ const loginUser_post = async (req, res) => {
   const token = createToken(user._id);
 
   // res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
-  res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 }); // this maxAge is in milisecond while jwt is in seconds maxage
+  // res.cookie("jwt", token, {
+  //   httpOnly: true,
+  //   maxAge: maxAge * 1000,
+  //   // sameSite: "none",
+  // }); // this maxAge is in milisecond while jwt is in seconds maxage
+
+  res
+    .status(200)
+    .cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+      domain:
+        process.env.NODE_ENV === "development" ? ".localhost" : "https://tea-brand-ecommerce-fe-nextjs.vercel.app/",
+    })
+    .json();
 
   // sending a cookie response ..
   // res.cookie("Hi", true);
@@ -898,7 +912,7 @@ const resetpasswordemail_post = async (req, res, next) => {
     to: `${getuser.email}`,
     subject: "Reset Password Email",
     text: "Hello, please open this link to reset your password, (note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)",
-    html: `<a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}">https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}</a>
+    html: `<a href="http://localhost:3000/resetpassword/${token}">http://localhost:3000/resetpassword/${token}</a>
      <br>Please open this link to reset your password<br>
      <br>Click on the link to open it or copy it to the browser to open it<br>
      <br><br> <br>(note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)<br>`,
@@ -956,7 +970,7 @@ const orderConfirmedemail_post = async (req, res, next) => {
          <br>Order Number ${1000 + userOrderNumber}<br>
          <br><br>
          <br>If you want to check our other products please visit this link<br>
-         <a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections">https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections</a>
+         <a href="http://localhost:3000/collections">http://localhost:3000/collections</a>
          <br><br>
          <br>And If you have any question or inquiry please don't hesitate to open the live chat on our website or contact us<br>
          `,
