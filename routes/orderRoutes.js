@@ -32,7 +32,7 @@ router.post(
 // Restricted to admin //
 
 //get all orders
-router.get(
+router.post(
   "/getallorders",
   authController.requireAuth,
   authController.restrictTo,

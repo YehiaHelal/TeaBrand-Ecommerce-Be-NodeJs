@@ -119,7 +119,7 @@ router.post(
 // Restricted to admin //
 
 //GET ALL users
-router.get(
+router.post(
   "/getallusers",
   authController.requireAuth,
   authController.restrictTo,
@@ -224,7 +224,7 @@ router.post(
 );
 
 //GET Dashboard general data about users/orders/products/livechats
-router.get(
+router.post(
   "/dashboarddata",
   authController.requireAuth,
   authController.restrictTo,

@@ -110,11 +110,11 @@ const loginUser_post = async (req, res) => {
   //  jwt cookie send // sending the cookie from here
   const token = createToken(user._id);
 
-  res.cookie("jwt", token, {
-    httpOnly: true,
-    maxAge: maxAge * 1000,
-    sameSite: "none",
-  }); // this maxAge is in milisecond while jwt is in seconds maxage
+  // res.cookie("jwt", token, {
+  //   httpOnly: true,
+  //   maxAge: maxAge * 1000,
+  // });
+  // this maxAge is in milisecond while jwt is in seconds maxage
   // res.cookie("jwt", token, {
   //   httpOnly: true,
   //   maxAge: maxAge * 1000,
@@ -145,7 +145,7 @@ const logoutUser_post = async (req, res) => {
   //
 
   // sending the empty 1sec expirey data cookie to replace the jwt on the browser
-  res.cookie("jwt", "", { maxAge: 10 }); // this works in second so this means 1 sec
+  // res.cookie("jwt", "", { maxAge: 10 }); // this works in second so this means 1 sec
 
   res.status(200).json({ message: "logout done" });
 };
@@ -906,7 +906,7 @@ const resetpasswordemail_post = async (req, res, next) => {
     to: `${getuser.email}`,
     subject: "Reset Password Email",
     text: "Hello, please open this link to reset your password, (note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)",
-    html: `<a href="https://zippy-horse-78b7b7.netlify.app/resetpassword/${token}">https://zippy-horse-78b7b7.netlify.app/resetpassword/${token}</a>
+    html: `<a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}">https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}</a>
      <br>Please open this link to reset your password<br>
      <br>Click on the link to open it or copy it to the browser to open it<br>
      <br><br> <br>(note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)<br>`,
@@ -964,7 +964,7 @@ const orderConfirmedemail_post = async (req, res, next) => {
          <br>Order Number ${1000 + userOrderNumber}<br>
          <br><br>
          <br>If you want to check our other products please visit this link<br>
-         <a href="https://zippy-horse-78b7b7.netlify.app/collections">https://zippy-horse-78b7b7.netlify.app/collections</a>
+         <a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections">https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections</a>
          <br><br>
          <br>And If you have any question or inquiry please don't hesitate to open the live chat on our website or contact us<br>
          `,
@@ -1339,39 +1339,42 @@ const deactivateUser_post = async (req, res) => {
   // the item selected to be updated
   // the updated data
 
-  // console.log(req.body.Users.email);
+  // console.log(req.body.submission);
 
-  // order number to find it
-  // console.log(req.body.order.ordernumber);
-
-  // order state completed or not
-  // console.log(req.body.order.opened);
-
-  // De-activating the user
-  const user = await User.findOneAndUpdate(
-    { email: req.body.Users.email },
-    { active: false },
-    {
-      new: true,
-    }
-  );
-
-  if (!user) {
-    return res.status(400).json({ error: "Error" });
-  }
-
-  // console.log(user);
-
-  // console.log(order);
-  // const order = await Order.findOneAndDelete({
-  //   ordernumber: req.body.submission.ordernumber,
-  // });
-
-  // if (!order) {
-  //   return res.status(400).json({ error: "Error, No such Order found" });
+  // if (!user) {
+  //   return res.status(400).json({ error: "Error" });
   // }
 
-  res.status(200).json({ message: "user deactivited " });
+  const userSelected = await User.findOne({
+    email: req.body.submission.Users.email,
+    active: true,
+  });
+
+  if (userSelected) {
+    const userSelectedDeactivitedAction = await User.findOneAndUpdate(
+      { email: req.body.submission.Users.email },
+      { active: false },
+      {
+        new: true,
+      }
+    );
+
+    console.log("Deactivited");
+  }
+
+  if (!userSelected) {
+    const userSelectedDeactivitedAction = await User.findOneAndUpdate(
+      { email: req.body.submission.Users.email },
+      { active: true },
+      {
+        new: true,
+      }
+    );
+
+    console.log("Reversed Deactivite");
+  }
+
+  res.status(200).json({ message: "user deactivited or reversed " });
 };
 
 // Add new User
@@ -1588,7 +1591,7 @@ const adminjoinchat_post = async (req, res) => {
       { new: true }
     );
 
-    // console.log(newItem);
+    console.log(newItem);
     return res.status(200).json({ Message: "Joined Chat successfully" });
   } catch (error) {
     return res.status(400).json({ error: "Error Joining Chat" });

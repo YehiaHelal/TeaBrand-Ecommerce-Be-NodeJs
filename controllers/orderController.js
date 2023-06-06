@@ -11,7 +11,7 @@ const { S3Client } = require("@aws-sdk/client-s3");
 // create new user
 const cartOrder_post = async (req, res) => {
   //  console.log(req.body.OrderDetails);
-  const { orderProducts, orderTotalValue } = req.body.OrderDetails; // from the req.body sent from the frontend
+  const { orderProducts, orderTotalValue } = req.body.submission.OrderDetails; // from the req.body sent from the frontend
 
   const getuserData = await User.findOne({ email: res.locals.user.email });
 
@@ -19,6 +19,8 @@ const cartOrder_post = async (req, res) => {
   // console.log(req.current);
   // console.log(res.locals.user);
   // console.log(res.locals.user.email);
+
+  // console.log("data");
 
   // console.log(orderProducts);
   // console.log(orderTotalValue);
@@ -184,7 +186,7 @@ const markOrderCompleted_post = async (req, res) => {
   // the updated data
 
   // order number to find it
-  // console.log(req.body.order.ordernumber);
+  console.log(req.body.submission);
 
   // order state completed or not
   // console.log(req.body.order.opened);
@@ -194,13 +196,13 @@ const markOrderCompleted_post = async (req, res) => {
   // Marking Order completed user image
 
   const orderMarkcompleted = await Order.findOne({
-    ordernumber: req.body.order.ordernumber,
+    ordernumber: req.body.submission.order.ordernumber,
     opened: true,
   });
 
   if (orderMarkcompleted) {
     const orderMarkcompletedAction = await Order.findOneAndUpdate(
-      { ordernumber: req.body.order.ordernumber },
+      { ordernumber: req.body.submission.order.ordernumber },
       { opened: false },
       {
         new: true,
@@ -212,7 +214,7 @@ const markOrderCompleted_post = async (req, res) => {
 
   if (!orderMarkcompleted) {
     const orderMarkNotcompletedReverseAction = await Order.findOneAndUpdate(
-      { ordernumber: req.body.order.ordernumber, opened: false },
+      { ordernumber: req.body.submission.order.ordernumber, opened: false },
       { opened: true },
       {
         new: true,
@@ -221,7 +223,7 @@ const markOrderCompleted_post = async (req, res) => {
 
     console.log("reverse");
     // const orderMarkcompletedAction = await Order.findOneAndUpdate(
-    //   { ordernumber: req.body.order.ordernumber },
+    //   { ordernumber: req.body.submission.order.ordernumber },
     //   { opened: false },
     //   {
     //     new: true,
@@ -230,7 +232,7 @@ const markOrderCompleted_post = async (req, res) => {
   }
 
   // const orderMarkNotcompletedReverse = await Order.findOne({
-  //   ordernumber: req.body.order.ordernumber,
+  //   ordernumber: req.body.submission.order.ordernumber,
   //   opened: false,
   // });
 
@@ -238,7 +240,7 @@ const markOrderCompleted_post = async (req, res) => {
 
   // if (orderMarkNotcompletedReverse) {
   //   const orderMarkNotcompletedReverseAction = await Order.findOneAndUpdate(
-  //     { ordernumber: req.body.order.ordernumber },
+  //     { ordernumber: req.body.submission.order.ordernumber },
   //     { opened: true },
   //     {
   //       new: true,
@@ -260,7 +262,7 @@ const markOrderCompleted_post = async (req, res) => {
 
   // console.log(order);
   // const order = await Order.findOneAndDelete({
-  //   ordernumber: req.body.submission.ordernumber,
+  //   ordernumber: req.body.submission.submission.ordernumber,
   // });
 
   // if (!order) {
@@ -274,19 +276,19 @@ const markOrderCompleted_post = async (req, res) => {
 
 const OrderAddNote_post = async (req, res) => {
   // order selected to add note to
-  // console.log(req.body.ordernumber);
+  // console.log(req.body.submission);
 
   // note wanted to be added
-  // console.log(req.body.note);
+  // console.log(req.body.submission.note);
 
   // order state completed or not
-  // console.log(req.body.order.opened);
+  // console.log(req.body.submission.order.opened);
 
   // Adding note the order
 
   const order = await Order.findOneAndUpdate(
-    { ordernumber: req.body.ordernumber },
-    { note: req.body.note },
+    { ordernumber: req.body.submission.ordernumber },
+    { note: req.body.submission.note },
     {
       new: true,
     }

@@ -3,24 +3,87 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const User = require("../models/userModel");
 
+// checking token from cookie but nextjs have error with that so using local storage
+// const requireAuth = async (req, res, next) => {
+//   let token;
+//   if (
+//     req.headers.authorization &&
+//     req.headers.authorization.startsWith("Bearer")
+//   ) {
+//     token = req.headers.authorization.split(" ")[1];
+//   } else if (req.cookies.jwt) {
+//     token = req.cookies.jwt;
+//   }
+
+//   // console.log(req.cookies);
+
+//   if (!token) {
+//     return res
+//       .status(401)
+//       .json({ error: "You are not logged in! Please log in to get access." });
+//   }
+
+//   // 2) Verification token
+//   const decoded = await promisify(jwt.verify)(token, process.env.JWT_Secret);
+
+//   // 3) Check if user still exists
+//   const currentUser = await User.findById(decoded.id);
+
+//   if (!currentUser) {
+//     return res
+//       .status(401)
+//       .json({ error: "You are not logged in! Please log in to get access." });
+//   }
+
+//   // return res.status(200).json({ meesage: "u are in all good" });
+//   // GRANT ACCESS TO PROTECTED ROUTE
+//   req.user = currentUser;
+//   res.locals.user = currentUser;
+
+//   // console.log(res.locals.user);
+
+//   next();
+// };
+
+//using local storage to send token and check user
 const requireAuth = async (req, res, next) => {
+  // console.log(req.body.jwt);
+
   let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
+
+  if (req.body.jwt !== undefined) {
+    token = req.body.jwt;
   }
 
-  // console.log(req.cookies);
+  if (req.body.submission) {
+    if (req.body.submission.token) {
+      token = req.body.submission.token;
+    }
+  }
 
-  if (!token) {
+  if (!req.body.submission && !req.body.jwt) {
     return res
       .status(401)
       .json({ error: "You are not logged in! Please log in to get access." });
   }
+
+  // let token;
+  // if (
+  //   req.headers.authorization &&
+  //   req.headers.authorization.startsWith("Bearer")
+  // ) {
+  //   token = req.headers.authorization.split(" ")[1];
+  // } else if (req.cookies.jwt) {
+  //   token = req.cookies.jwt;
+  // }
+
+  // console.log(req.cookies);
+
+  // if (!token) {
+  //   return res
+  //     .status(401)
+  //     .json({ error: "You are not logged in! Please log in to get access." });
+  // }
 
   // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_Secret);
@@ -32,6 +95,13 @@ const requireAuth = async (req, res, next) => {
     return res
       .status(401)
       .json({ error: "You are not logged in! Please log in to get access." });
+  }
+
+  console.log(currentUser);
+
+  if (currentUser.active === false) {
+    console.log("disabled");
+    return res.status(401).json({ error: "Your account is disabled!" });
   }
 
   // return res.status(200).json({ meesage: "u are in all good" });
