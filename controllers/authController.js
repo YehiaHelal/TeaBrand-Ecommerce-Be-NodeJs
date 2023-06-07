@@ -85,29 +85,36 @@ const requireAuth = async (req, res, next) => {
   //     .json({ error: "You are not logged in! Please log in to get access." });
   // }
 
-  // 2) Verification token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_Secret);
+  try {
+    // 2) Verification token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_Secret);
 
-  // 3) Check if user still exists
-  const currentUser = await User.findById(decoded.id);
+    // 3) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
 
-  if (!currentUser) {
+    if (!currentUser) {
+      return res
+        .status(401)
+        .json({ error: "You are not logged in! Please log in to get access." });
+    }
+
+    // console.log(currentUser);
+
+    if (currentUser.active === false) {
+      // console.log("disabled");
+      return res.status(401).json({ error: "Your account is disabled!" });
+    }
+
+    // return res.status(200).json({ meesage: "u are in all good" });
+    // GRANT ACCESS TO PROTECTED ROUTE
+    req.user = currentUser;
+    res.locals.user = currentUser;
+  } catch (error) {
+    // console.log("error");
     return res
       .status(401)
       .json({ error: "You are not logged in! Please log in to get access." });
   }
-
-  console.log(currentUser);
-
-  if (currentUser.active === false) {
-    console.log("disabled");
-    return res.status(401).json({ error: "Your account is disabled!" });
-  }
-
-  // return res.status(200).json({ meesage: "u are in all good" });
-  // GRANT ACCESS TO PROTECTED ROUTE
-  req.user = currentUser;
-  res.locals.user = currentUser;
 
   // console.log(res.locals.user);
 
