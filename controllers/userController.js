@@ -309,7 +309,7 @@ const resizeUserPhoto = async (req, res, next) => {
   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
   const params = {
-    Bucket: "yehia-bucket-v1",
+    Bucket: "next-ecommerce-s3",
     // Key: req.files.photo.name,
     Key: `${emailwithoutatsign}.png`,
     Body: fileContent,
@@ -385,7 +385,7 @@ const resizeUserPhoto = async (req, res, next) => {
 //   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
 //   const params = {
-//     Bucket: "yehia-bucket-v1",
+//     Bucket: "next-ecommerce-s3",
 //     // Key: req.files.photo.name,
 //     Key: `${itemName}.png`,
 //     Body: fileContent,
@@ -461,7 +461,7 @@ const resizeUserPhoto = async (req, res, next) => {
 //   // const fileContent = Buffer.from(req.files.photo.data, "binary");
 
 //   // const params = {
-//   //   Bucket: "yehia-bucket-v1",
+//   //   Bucket: "next-ecommerce-s3",
 //   //   Key: req.files.photo.name,
 //   //   Body: fileContent,
 //   //   ACL: "public-read",

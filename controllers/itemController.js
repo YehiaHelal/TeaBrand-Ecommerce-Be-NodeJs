@@ -114,7 +114,7 @@ const createNewItem_post = async (req, res) => {
   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
   const params = {
-    Bucket: "yehia-bucket-v1/items",
+    Bucket: "next-ecommerce-s3/items",
     // Key: req.files.photo.name,
     Key: `${productname}.png`,
     Body: fileContent,
@@ -298,7 +298,7 @@ const updateItem_post = async (req, res) => {
     const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
     const params = {
-      Bucket: "yehia-bucket-v1/items",
+      Bucket: "next-ecommerce-s3/items",
       // Key: req.files.photo.name,
       Key: `${productNameCheckv2}.png`,
       Body: fileContent,
@@ -347,7 +347,7 @@ const updateItem_post = async (req, res) => {
     const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
     const params = {
-      Bucket: "yehia-bucket-v1/items",
+      Bucket: "next-ecommerce-s3/items",
       // Key: req.files.photo.name,
       Key: `${selectedItem}.png`,
       Body: fileContent,
