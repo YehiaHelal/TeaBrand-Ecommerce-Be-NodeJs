@@ -262,13 +262,130 @@ const updateUser_post = async (req, res) => {
 
 // without multer and using only sharp
 
-const resizeUserPhoto = async (req, res, next) => {
+// sending the image back to the frontend
+const ImageProfileSendBackToFe = async (req, res, next) => {
+  // to get the user email and full data
+  // console.log(req.user.email);
+  // console.log(res.locals.user);
+
+  // console.log(req.file);
+
+  const extensionName = "jpeg";
+
+  // const directionname = path.join(
+  //   __dirname,
+  //   `/../public/users/${req.user.email}.jpeg`
+  // );
+
+  // `public/products/`;
+
+  // const directionname = path.join(
+  //   __dirname,
+  //   `/../public/users/${req.user.email}.jpeg`
+  // );
+
+  // const directionnamerr = path.dirname(
+  //   "/../public/users/devyehia@gmail.com.jpeg"
+  // );
+
+  // const directionnameplace = path.resolve(
+  //   `./public/users/${req.user.email}.jpeg`
+  // );
+
+  // const directionnameplaceloc = path.resolve(
+  //   `./public/users/devyehia@gmail.com.jpeg`
+  // );
+
+  // console.log(directionnameplaceloc);
+
+  // const directionnameplace = path.resolve(`devyehia@gmail.com.jpeg`);
+
+  // console.log(directionnameplace);
+
+  //  fs.readFile(`/${req.user.email}.jpeg`, function (err, data) {
+  // if (err)
+  //   return res
+  //     .status(200)
+  //     .json({ message: "no image", direction: directionnameplace }); // Fail if the file can't be read.
+
+  // const base64Image = Buffer.from(data, "binary").toString("base64");
+
+  // res.status(200).json({ code: "there is a file" });
+
+  // const directionnameplaceloc = path.resolve(process.cwd(), "public");
+
+  // var path = require("path");
+
+  // res.status(200).json({ images: process.cwd() });
+
+  fs.readFile(
+    `${process.cwd()}/public/users/${req.user.email}.jpeg`,
+    function (err, data) {
+      //   "utf8"
+      // );
+
+      // fs.readFile(`${req.user.email}.jpeg`, function (err, data) {
+      // fs.readFileSync(directionnameplaceloc, function (err, data) {
+      if (err) {
+        // console.log(err);
+        return res.status(400).json({ error: err, loc: process.cwd() });
+      } // Fail if the file can't be read.
+      // {
+      //   encoding: "base64",
+      // },
+
+      const base64Image = Buffer.from(data, "binary").toString("base64");
+
+      const base64ImageStr = `data:image/${extensionName
+        .split(".")
+        .pop()};base64,${base64Image}`;
+
+      // res.status(200).json({ images: base64ImageStr });
+      // res.status(200).json({ images: base64ImageStr });
+
+      res.setHeader("Content-Type", "multipart/form-data");
+
+      res.status(200).json({ images: base64ImageStr });
+    }
+  );
+
+  // // convert image file to base64-encoded string
+  // const base64Image = Buffer.from(data, "binary").toString("base64");
+
+  // const base64ImageStr = `data:image/${extensionName
+  //   .split(".")
+  //   .pop()};base64,${base64Image}`;
+
+  // // console.log(base64ImageStr);
+
+  // return base64ImageStr;
+  // console.log(data);
+
+  // fs.readFile(directionname, function (err, data) {
+  // fs.readFile(directionnameplace, function (err, data) {
+  //   // fs.readFile(`/${req.user.email}.jpeg`, function (err, data) {
+  //   if (err)
+  //     return res
+  //       .status(200)
+  //       .json({ message: "no image", direction: directionnameplace }); // Fail if the file can't be read.
+
+  //   const base64Image = Buffer.from(data, "binary").toString("base64");
+
+  //   const base64ImageStr = `data:image/${extensionName
+  //     .split(".")
+  //     .pop()};base64,${base64Image}`;
+
+  // res.status(200).json({ images: base64ImageStr, direction: directionname });
+  // });
+};
+
+const imageUserAddUpdate = async (req, res, next) => {
   // to get the user email and full data
   // console.log(req.user.email);
   // console.log(res.locals.user);
 
   // splitting the user email after @
-  const emailwithoutatsign = req.user.email.split("@")[0];
+  // const emailwithoutatsign = req.user.email.split("@")[0];
 
   // console.log(emailwithoutatsign);
 
@@ -281,47 +398,60 @@ const resizeUserPhoto = async (req, res, next) => {
   // file name senf from frontend
   // console.log(req.files.photo.name);
 
-  // const path = `./../frontend/public/users/images/${req.user.email}.jpeg`;
+  //buffer
+  // console.log(req.files.photo.data);
 
-  // await sharp(req.file.buffer)
-  //   .resize(300, 300)
-  //   .toFormat("jpeg")
-  //   .jpeg({ quality: 90 });
-  // //   .toFile(path);
+  // `${process.cwd()}/public/users/devyehia@gmail.com.jpeg`;
 
-  const semiTransparentRedPng = await sharp(req.files.photo.data)
+  // const pathlocationth = `${process.cwd()}/public/users/${req.user.email}.jpeg`;
+
+  // console.log(pathlocationth);
+
+  // const pathlocationth = `./../public/users/${req.user.email}.jpeg`;
+
+  const pathlocationth = `${process.cwd()}/public/users/${req.user.email}.jpeg`;
+
+  await sharp(req.files.photo.data)
     .resize(300, 300)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    // .png()
-    .toBuffer();
+    .toFile(pathlocationth);
 
-  // console.log(semiTransparentRedPng);
+  res.status(200).json({ message: `user image updated successfully` });
 
-  AWS.config.update({
-    accessKeyId: process.env.accessKeyId,
-    secretAccessKey: process.env.secretAccessKey,
-    region: process.env.region,
-  });
+  // const semiTransparentRedPng = await sharp(req.files.photo.data)
+  //   .resize(300, 300)
+  //   .toFormat("jpeg")
+  //   .jpeg({ quality: 90 })
+  //   // .png()
+  //   .toBuffer();
 
-  const s3 = new AWS.S3();
+  // uploading to s3
 
-  const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+  // AWS.config.update({
+  //   accessKeyId: process.env.accessKeyId,
+  //   secretAccessKey: process.env.secretAccessKey,
+  //   region: process.env.region,
+  // });
 
-  const params = {
-    Bucket: "next-ecommerce-s3",
-    // Key: req.files.photo.name,
-    Key: `${emailwithoutatsign}.png`,
-    Body: fileContent,
-    ACL: "public-read",
-  };
+  // const s3 = new AWS.S3();
 
-  s3.upload(params, (err, data) => {
-    if (err) {
-      throw err;
-    }
-    res.send({ data: data });
-  });
+  // const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+
+  // const params = {
+  //   Bucket: "next-ecommerce-s3",
+  //   // Key: req.files.photo.name,
+  //   Key: `${emailwithoutatsign}.png`,
+  //   Body: fileContent,
+  //   ACL: "public-read",
+  // };
+
+  // s3.upload(params, (err, data) => {
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   res.send({ data: data });
+  // });
 
   // updating user image
   // const user = await User.findOneAndUpdate(
@@ -334,6 +464,79 @@ const resizeUserPhoto = async (req, res, next) => {
 
   // res.status(200).json({ message: "Image Added Successfully" });
 };
+
+// const resizeUserPhoto = async (req, res, next) => {
+//   // to get the user email and full data
+//   // console.log(req.user.email);
+//   // console.log(res.locals.user);
+
+//   // splitting the user email after @
+//   const emailwithoutatsign = req.user.email.split("@")[0];
+
+//   // console.log(emailwithoutatsign);
+
+//   // full file name senf from frontend
+//   // console.log(req.files.photo);
+
+//   // file name senf from frontend
+//   // console.log(req.files.photo.data);
+
+//   // file name senf from frontend
+//   // console.log(req.files.photo.name);
+
+//   // const path = `./../frontend/public/users/images/${req.user.email}.jpeg`;
+
+//   // await sharp(req.file.buffer)
+//   //   .resize(300, 300)
+//   //   .toFormat("jpeg")
+//   //   .jpeg({ quality: 90 });
+//   // //   .toFile(path);
+
+//   const semiTransparentRedPng = await sharp(req.files.photo.data)
+//     .resize(300, 300)
+//     .toFormat("jpeg")
+//     .jpeg({ quality: 90 })
+//     // .png()
+//     .toBuffer();
+
+//   // console.log(semiTransparentRedPng);
+
+//   AWS.config.update({
+//     accessKeyId: process.env.accessKeyId,
+//     secretAccessKey: process.env.secretAccessKey,
+//     region: process.env.region,
+//   });
+
+//   const s3 = new AWS.S3();
+
+//   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+
+//   const params = {
+//     Bucket: "next-ecommerce-s3",
+//     // Key: req.files.photo.name,
+//     Key: `${emailwithoutatsign}.png`,
+//     Body: fileContent,
+//     ACL: "public-read",
+//   };
+
+//   s3.upload(params, (err, data) => {
+//     if (err) {
+//       throw err;
+//     }
+//     res.send({ data: data });
+//   });
+
+//   // updating user image
+//   // const user = await User.findOneAndUpdate(
+//   //   { email: res.locals.user.email },
+//   //   { photo: req.file.originalname },
+//   //   {
+//   //     new: true,
+//   //   }
+//   // );
+
+//   // res.status(200).json({ message: "Image Added Successfully" });
+// };
 
 // for items adding
 // const resizeItemPhoto = async (req, res, next) => {
@@ -606,7 +809,7 @@ const uploadingImagesToS3 = async (req, res, next) => {
   // );
   // const image = fs.readFile("image1.png");
 
-  fs.readFile("public/image1.png", function (err, data) {
+  fs.readFile(`${process.cwd()}/public/image1.png`, function (err, data) {
     if (err) throw err; // Fail if the file can't be read.
     // http.createServer(function(req, res) {
     //   res.writeHead(200, {'Content-Type': 'image/jpeg'})
@@ -615,7 +818,7 @@ const uploadingImagesToS3 = async (req, res, next) => {
     // console.log('Server running at http://localhost:8124/')
     // console.log(data);
 
-    res.download("public/image1.png");
+    // res.download("public/image1.png");
 
     res.status(200).json({ message: "Image Added Successfully" });
 
@@ -906,7 +1109,7 @@ const resetpasswordemail_post = async (req, res, next) => {
     to: `${getuser.email}`,
     subject: "Reset Password Email",
     text: "Hello, please open this link to reset your password, (note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)",
-    html: `<a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}">https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}</a>
+    html: `<a href="http://localhost:3000/resetpassword/${token}">http://localhost:3000/resetpassword/${token}</a>
      <br>Please open this link to reset your password<br>
      <br>Click on the link to open it or copy it to the browser to open it<br>
      <br><br> <br>(note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)<br>`,
@@ -964,7 +1167,7 @@ const orderConfirmedemail_post = async (req, res, next) => {
          <br>Order Number ${1000 + userOrderNumber}<br>
          <br><br>
          <br>If you want to check our other products please visit this link<br>
-         <a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections">https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections</a>
+         <a href="http://localhost:3000/collections">http://localhost:3000/collections</a>
          <br><br>
          <br>And If you have any question or inquiry please don't hesitate to open the live chat on our website or contact us<br>
          `,
@@ -1112,7 +1315,7 @@ const openChat_post = async (req, res) => {
     opened: true,
   });
 
-  console.log(getchat);
+  // console.log(getchat);
 
   if (getchat) {
     // console.log("there is");
@@ -1359,7 +1562,7 @@ const deactivateUser_post = async (req, res) => {
       }
     );
 
-    console.log("Deactivited");
+    // console.log("Deactivited");
   }
 
   if (!userSelected) {
@@ -1371,7 +1574,7 @@ const deactivateUser_post = async (req, res) => {
       }
     );
 
-    console.log("Reversed Deactivite");
+    // console.log("Reversed Deactivite");
   }
 
   res.status(200).json({ message: "user deactivited or reversed " });
@@ -1591,7 +1794,7 @@ const adminjoinchat_post = async (req, res) => {
       { new: true }
     );
 
-    console.log(newItem);
+    // console.log(newItem);
     return res.status(200).json({ Message: "Joined Chat successfully" });
   } catch (error) {
     return res.status(400).json({ error: "Error Joining Chat" });
@@ -1751,7 +1954,7 @@ module.exports = {
   deleteUser_post,
   getAllUsers_post,
   AddUserAdmin_post,
-  resizeUserPhoto,
+  // resizeUserPhoto,
   saveContact_post,
   getNameData_post,
   changePassword_post,
@@ -1774,4 +1977,6 @@ module.exports = {
   adminmarkformanger_post,
   adminblockuseremail_post,
   dashboardData_post,
+  ImageProfileSendBackToFe,
+  imageUserAddUpdate,
 };

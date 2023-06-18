@@ -7,6 +7,8 @@ require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 const fileUpload = require("express-fileupload");
 const { S3Client } = require("@aws-sdk/client-s3");
 const axios = require("axios");
+const pathdirections = require("path");
+const fs = require("fs");
 
 // get all items
 
@@ -32,6 +34,107 @@ const getItem = async (req, res) => {
   }
 
   res.status(200).json(item);
+};
+
+// sending the image back to the frontend
+const ProductsImageSendBackToFe = async (req, res, next) => {
+  // get all products images from the backend and sending it to the frontend
+
+  fs.readdir(`public/products/`, (err, files) => {
+    if (err) console.log(err);
+
+    // console.log("request");
+
+    // let productImageArray = [];
+    // let productImageArrayNames = [];
+
+    let productImageArrayObject = {};
+
+    const extensionName = "jpeg";
+
+    // console.log("\nCurrent directory filenames:");
+    files.forEach((filename, i) => {
+      // console.log(data);
+
+      // console.log(filename);
+
+      const result = fs.readFileSync(
+        `public/products/${filename}`,
+        // {
+        //   encoding: "base64",
+        // },
+
+        function (err, data) {
+          if (err) {
+            return res.status(200).json({ message: "no image" });
+          }
+
+          return data;
+
+          // // convert image file to base64-encoded string
+          // const base64Image = Buffer.from(data, "binary").toString("base64");
+
+          // const base64ImageStr = `data:image/${extensionName
+          //   .split(".")
+          //   .pop()};base64,${base64Image}`;
+
+          // // console.log(base64ImageStr);
+
+          // return base64ImageStr;
+          // console.log(data);
+        }
+      );
+
+      // convert image file to base64-encoded string
+      let base64Image = Buffer.from(result, "binary").toString("base64");
+
+      let base64ImageStr = `data:image/${extensionName
+        .split(".")
+        .pop()};base64,${base64Image}`;
+
+      productImageArrayObject[filename.split(".")[0]] = base64ImageStr;
+
+      // productImageArrayNames.push(filename);
+      // productImageArray.push(result);
+    });
+
+    let darray = [];
+
+    // console.log(productImageArrayNames);
+
+    // console.log(productImageArrayObject);
+
+    // Object.entries(productImageArrayObject).forEach(
+    //   (entry) => `${entry}: ${"1"}`
+    // );
+
+    // county.nameCombined = `${county.countyCode} (${county.stateCode})`;
+    // county.codeCombined = `${county.countyCode} ${county.stateCode} ${countyName}`;
+
+    // console.log(productImageArrayObject);
+
+    // productImageArray.forEach((data, i) => {
+    //   // console.log(data);
+
+    //   // convert image file to base64-encoded string
+    //   const base64Image = Buffer.from(data, "binary").toString("base64");
+
+    //   const base64ImageStr = `data:image/${extensionName
+    //     .split(".")
+    //     .pop()};base64,${base64Image}`;
+
+    //   // console.log(base64ImageStr);
+    //   darray.push(base64ImageStr);
+
+    //   // console.log(data);
+    // });
+
+    // console.log(darray);
+
+    // console.log(productImageArrayObject);
+
+    return res.status(200).json({ images: productImageArrayObject });
+  });
 };
 
 // create new item
@@ -186,13 +289,49 @@ const deleteItem_post = async (req, res) => {
   //   return res.status(404).json({ error: "No such item" });
   // }
 
-  const item = await Item.findOneAndDelete({ name: name });
+  try {
+    // console.log(name);
+    const item = await Item.findOneAndDelete({ name: name });
 
-  if (!item) {
-    return res.status(400).json({ error: "Error, No such item found" });
+    if (!item) {
+      return res.status(400).json({ error: "Error, No such item found" });
+    }
+
+    // console.log(
+    //   pathdirections.join(__dirname, `/../public/products/${name}.jpeg`)
+    // );
+    // Deleting Item Image too
+
+    // const filepathLocation = `${process.cwd()}/public/products/${name}.jpeg`;
+
+    let filepathLocation = pathdirections.resolve(
+      "public",
+      "products",
+      `${name}.jpeg`
+    );
+
+    // fs.unlink('./server/upload/my.csv',function(err){
+    fs.unlink(filepathLocation, function (err) {
+      if (err) console.log(err);
+      console.log("file deleted successfully");
+    });
+
+    // fs.unlink(filepathLocation),
+    //   (err) => {
+    //     if (err) {
+    //       // console.log("error");
+    //     }
+    //     // return res
+    //     //   .status(400)
+    //     //   .json({ error: "File doesn't exist, can't find it." });
+
+    //     // console.log("successfully deleted");
+    //   };
+
+    res.status(200).json({ message: "Item Deleted" });
+  } catch (error) {
+    res.status(400).json({ message: "Error, Deleting Item" });
   }
-
-  res.status(200).json({ message: "Item Deleted" });
 };
 
 // update a item
@@ -262,111 +401,183 @@ const updateItem_post = async (req, res) => {
 
   // adding the Product Image to the S3 Bucket
 
-  if (req.body.name && !req.files) {
-    // console.log(
-    //   "there is no photo but there is name change, effecting image fetching so.."
-    // );
+  // if editing image
+  if (req.files && !req.body.name) {
+    const path = `${process.cwd()}/public/products/${selectedItem}.jpeg`;
 
-    // const selectedItemUrl = "";
-
-    const response = await axios.get(req.body.selectedItemUrl, {
-      responseType: "arraybuffer",
-    });
-    const buffer = Buffer.from(response.data, "utf-8");
-
-    const productNameCheckv2 = req.body.name;
-
-    // console.log(productNameCheckv2);
-
-    const semiTransparentRedPng = await sharp(buffer)
+    await sharp(req.files.photo.data)
       .resize(300, 300)
       .toFormat("jpeg")
       .jpeg({ quality: 90 })
-      // .png()
-      .toBuffer();
-
-    // console.log(semiTransparentRedPng);
-
-    AWS.config.update({
-      accessKeyId: process.env.accessKeyId,
-      secretAccessKey: process.env.secretAccessKey,
-      region: process.env.region,
-    });
-
-    const s3 = new AWS.S3();
-
-    const fileContent = Buffer.from(semiTransparentRedPng, "binary");
-
-    const params = {
-      Bucket: "next-ecommerce-s3/items",
-      // Key: req.files.photo.name,
-      Key: `${productNameCheckv2}.png`,
-      Body: fileContent,
-      ACL: "public-read",
-    };
-
-    s3.upload(params, (err, data) => {
-      if (err) {
-        throw err;
-      }
-      // res.send({ data: data });
-    });
-
-    // console.log("same Image uploaded");
+      .toFile(path);
   }
 
-  if (req.files) {
-    // console.log(selectedItem);
-    // console.log("there is photo");
+  // if editing image
+  try {
+    if (req.files && req.body.name) {
+      const path = `${process.cwd()}/public/products/${req.body.name}.jpeg`;
 
-    // const productNameCheck = selectedItem;
+      await sharp(req.files.photo.data)
+        .resize(300, 300)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(path);
 
-    console.log(selectedItem);
+      // console.log(`${process.cwd()}`);
 
-    // console.log(productNameCheck);
+      let unlinkfile = pathdirections.resolve(
+        "public",
+        "products",
+        `${selectedItem}.jpeg`
+      );
 
-    console.log(req.files.photo.data);
+      // fs.unlink('./server/upload/my.csv',function(err){
+      fs.unlink(unlinkfile, function (err) {
+        if (err) console.log(err);
+        // console.log("file deleted successfully");
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 
-    const semiTransparentRedPng = await sharp(req.files.photo.data)
-      .resize(300, 300)
-      .toFormat("jpeg")
-      .jpeg({ quality: 90 })
-      // .png()
-      .toBuffer();
+  // if editing product but not image
 
-    // console.log(semiTransparentRedPng);
+  if (req.body.name && !req.files) {
+    // const path = `./../backend/public/products/${selectedItem}.jpeg`;
 
-    AWS.config.update({
-      accessKeyId: process.env.accessKeyId,
-      secretAccessKey: process.env.secretAccessKey,
-      region: process.env.region,
+    //   await sharp(req.files.photo.data)
+    //     .resize(300, 300)
+    //     .toFormat("jpeg")
+    //     .jpeg({ quality: 90 })
+    //     .toFile(path);
+    // }
+
+    const filepathLocation = `${process.cwd()}/public/products/${selectedItem}.jpeg`;
+
+    const filepathLocationRename = `${process.cwd()}/public/products/${
+      req.body.name
+    }.jpeg`;
+
+    // fs.rename("/path/to/Afghanistan.png", "/path/to/AF.png", function (err) {
+    //   if (err) console.log("ERROR: " + err);
+    // });
+
+    fs.rename(filepathLocation, filepathLocationRename, function (err) {
+      if (err)
+        return res.status(400).json({ error: "Error updating Image name" });
+
+      // res.status(200);
     });
-
-    const s3 = new AWS.S3();
-
-    const fileContent = Buffer.from(semiTransparentRedPng, "binary");
-
-    const params = {
-      Bucket: "next-ecommerce-s3/items",
-      // Key: req.files.photo.name,
-      Key: `${selectedItem}.png`,
-      Body: fileContent,
-      ACL: "public-read",
-    };
-
-    s3.upload(params, (err, data) => {
-      if (err) {
-        console.log(err);
-        throw err;
-      }
-
-      console.log(data);
-    });
-
-    // console.log("Image uploaded");
   }
 
   res.status(200).json({ message: "was updated" });
+
+  // if (req.body.name && !req.files) {
+  //   // console.log(
+  //   //   "there is no photo but there is name change, effecting image fetching so.."
+  //   // );
+
+  //   // const selectedItemUrl = "";
+
+  //   const response = await axios.get(req.body.selectedItemUrl, {
+  //     responseType: "arraybuffer",
+  //   });
+  //   const buffer = Buffer.from(response.data, "utf-8");
+
+  //   const productNameCheckv2 = req.body.name;
+
+  //   // console.log(productNameCheckv2);
+
+  //   const semiTransparentRedPng = await sharp(buffer)
+  //     .resize(300, 300)
+  //     .toFormat("jpeg")
+  //     .jpeg({ quality: 90 })
+  //     // .png()
+  //     .toBuffer();
+
+  //   // console.log(semiTransparentRedPng);
+
+  //   AWS.config.update({
+  //     accessKeyId: process.env.accessKeyId,
+  //     secretAccessKey: process.env.secretAccessKey,
+  //     region: process.env.region,
+  //   });
+
+  //   const s3 = new AWS.S3();
+
+  //   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+
+  //   const params = {
+  //     Bucket: "next-ecommerce-s3/items",
+  //     // Key: req.files.photo.name,
+  //     Key: `${productNameCheckv2}.png`,
+  //     Body: fileContent,
+  //     ACL: "public-read",
+  //   };
+
+  //   s3.upload(params, (err, data) => {
+  //     if (err) {
+  //       throw err;
+  //     }
+  //     // res.send({ data: data });
+  //   });
+
+  //   // console.log("same Image uploaded");
+  // }
+
+  // if (req.files) {
+  //   // console.log(selectedItem);
+  //   // console.log("there is photo");
+
+  //   // const productNameCheck = selectedItem;
+
+  //   console.log(selectedItem);
+
+  //   // console.log(productNameCheck);
+
+  //   console.log(req.files.photo.data);
+
+  //   const semiTransparentRedPng = await sharp(req.files.photo.data)
+  //     .resize(300, 300)
+  //     .toFormat("jpeg")
+  //     .jpeg({ quality: 90 })
+  //     // .png()
+  //     .toBuffer();
+
+  //   // console.log(semiTransparentRedPng);
+
+  //   AWS.config.update({
+  //     accessKeyId: process.env.accessKeyId,
+  //     secretAccessKey: process.env.secretAccessKey,
+  //     region: process.env.region,
+  //   });
+
+  //   const s3 = new AWS.S3();
+
+  //   const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+
+  //   const params = {
+  //     Bucket: "next-ecommerce-s3/items",
+  //     // Key: req.files.photo.name,
+  //     Key: `${selectedItem}.png`,
+  //     Body: fileContent,
+  //     ACL: "public-read",
+  //   };
+
+  //   s3.upload(params, (err, data) => {
+  //     if (err) {
+  //       console.log(err);
+  //       throw err;
+  //     }
+
+  //     console.log(data);
+  //   });
+
+  //   // console.log("Image uploaded");
+  // }
+
+  // res.status(200).json({ message: "was updated" });
 
   // // const { name, price } = req.body.submission;
 
@@ -413,4 +624,5 @@ module.exports = {
   createNewItem_post,
   deleteItem_post,
   updateItem_post,
+  ProductsImageSendBackToFe,
 };

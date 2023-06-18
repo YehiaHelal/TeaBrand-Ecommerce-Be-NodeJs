@@ -8,6 +8,9 @@ const router = express.Router();
 // GET all Items
 router.get("/", itemController.getItems);
 
+// GET all Items Images
+router.get("/itemsImages", itemController.ProductsImageSendBackToFe);
+
 //GET a single Item
 router.get("/:id", itemController.getItem);
 

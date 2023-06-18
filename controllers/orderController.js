@@ -186,7 +186,7 @@ const markOrderCompleted_post = async (req, res) => {
   // the updated data
 
   // order number to find it
-  console.log(req.body.submission);
+  // console.log(req.body.submission);
 
   // order state completed or not
   // console.log(req.body.order.opened);
@@ -209,7 +209,7 @@ const markOrderCompleted_post = async (req, res) => {
       }
     );
 
-    console.log("marked complete");
+    // console.log("marked complete");
   }
 
   if (!orderMarkcompleted) {
@@ -221,7 +221,7 @@ const markOrderCompleted_post = async (req, res) => {
       }
     );
 
-    console.log("reverse");
+    // console.log("reverse");
     // const orderMarkcompletedAction = await Order.findOneAndUpdate(
     //   { ordernumber: req.body.submission.order.ordernumber },
     //   { opened: false },
