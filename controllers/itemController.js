@@ -197,39 +197,49 @@ const createNewItem_post = async (req, res) => {
   // adding the Product Image to the S3 Bucket
   // console.log(req.files);
 
-  const semiTransparentRedPng = await sharp(req.files.photo.data)
+  // Adding Image to backend locally public item file
+
+  const pathlocationth = `${process.cwd()}/public/products/${productname}.jpeg`;
+
+  await sharp(req.files.photo.data)
     .resize(300, 300)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    // .png()
-    .toBuffer();
+    .toFile(pathlocationth);
 
-  // console.log(semiTransparentRedPng);
+  // const semiTransparentRedPng = await sharp(req.files.photo.data)
+  //   .resize(300, 300)
+  //   .toFormat("jpeg")
+  //   .jpeg({ quality: 90 })
+  //   // .png()
+  //   .toBuffer();
 
-  AWS.config.update({
-    accessKeyId: process.env.accessKeyId,
-    secretAccessKey: process.env.secretAccessKey,
-    region: process.env.region,
-  });
+  // // console.log(semiTransparentRedPng);
 
-  const s3 = new AWS.S3();
+  // AWS.config.update({
+  //   accessKeyId: process.env.accessKeyId,
+  //   secretAccessKey: process.env.secretAccessKey,
+  //   region: process.env.region,
+  // });
 
-  const fileContent = Buffer.from(semiTransparentRedPng, "binary");
+  // const s3 = new AWS.S3();
 
-  const params = {
-    Bucket: "next-ecommerce-s3/items",
-    // Key: req.files.photo.name,
-    Key: `${productname}.png`,
-    Body: fileContent,
-    ACL: "public-read",
-  };
+  // const fileContent = Buffer.from(semiTransparentRedPng, "binary");
 
-  s3.upload(params, (err, data) => {
-    if (err) {
-      throw err;
-    }
-    // res.send({ data: data });
-  });
+  // const params = {
+  //   Bucket: "next-ecommerce-s3/items",
+  //   // Key: req.files.photo.name,
+  //   Key: `${productname}.png`,
+  //   Body: fileContent,
+  //   ACL: "public-read",
+  // };
+
+  // s3.upload(params, (err, data) => {
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   // res.send({ data: data });
+  // });
 
   // // const { name, price } = req.body.submission;
 
