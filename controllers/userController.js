@@ -10,6 +10,15 @@ const multer = require("multer");
 const path = require("path");
 const sharp = require("sharp");
 const { promisify } = require("util");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.NodeMailer_Email,
+    pass: process.env.NodeMailer_Password,
+  },
+});
 
 const http = require("http");
 const fs = require("fs");
@@ -1104,8 +1113,24 @@ const resetpasswordemail_post = async (req, res, next) => {
 
   // next();
 
-  const data = {
-    from: "Excited User <me@samples.mailgun.org>",
+  // const data = {
+  //   from: "Excited User <me@samples.mailgun.org>",
+  //   to: `${getuser.email}`,
+  //   subject: "Reset Password Email",
+  //   text: "Hello, please open this link to reset your password, (note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)",
+  //   html: `<a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}">https://tea-brand-ecommerce-fe-nextjs.vercel.app/resetpassword/${token}</a>
+  //    <br>Please open this link to reset your password<br>
+  //    <br>Click on the link to open it or copy it to the browser to open it<br>
+  //    <br><br> <br>(note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)<br>`,
+  // };
+
+  // mailgun.messages().send(data, function (error, body) {
+  //   // console.log(body);
+  //   res.status(200).json("email sent");
+  // });
+
+  const mailOptions = {
+    from: process.env.NodeMailer_Email,
     to: `${getuser.email}`,
     subject: "Reset Password Email",
     text: "Hello, please open this link to reset your password, (note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)",
@@ -1115,9 +1140,14 @@ const resetpasswordemail_post = async (req, res, next) => {
      <br><br> <br>(note if the link didn't work that might be because the email was added to the spam, you can copy the link and paste it, or mark the email as not spam to be able to open the link normally)<br>`,
   };
 
-  mailgun.messages().send(data, function (error, body) {
-    // console.log(body);
-    res.status(200).json("email sent");
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      return res.status(400).json("Error Sending mail");
+    } else {
+      // console.log("Email sent: " + info.response);
+      return res.status(200).json("Email sent");
+    }
   });
 };
 
@@ -1158,8 +1188,29 @@ const orderConfirmedemail_post = async (req, res, next) => {
   if (findOrder.mailSent === false) {
     // console.log("we will send for this one");
 
-    const data = {
-      from: "Excited User <me@samples.mailgun.org>",
+    // const data = {
+    //   from: "Excited User <me@samples.mailgun.org>",
+    //   to: `${findOrder.user}`,
+    //   subject: "TeaBrand, Order Placed Successfully",
+    //   text: "Thank you, Your order was placed successfully and we will prepare your package right away",
+    //   html: `<br>Thank you, Your order was placed successfully and we will prepare your package right away<br>
+    //      <br>Order Number ${1000 + userOrderNumber}<br>
+    //      <br><br>
+    //      <br>If you want to check our other products please visit this link<br>
+    //      <a href="https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections">https://tea-brand-ecommerce-fe-nextjs.vercel.app/collections</a>
+    //      <br><br>
+    //      <br>And If you have any question or inquiry please don't hesitate to open the live chat on our website or contact us<br>
+    //      `,
+    // };
+
+    // mailgun.messages().send(data, function (error, body) {
+    //   // console.log(body);
+    //   // res.status(200).json("email sent");
+    //   res.status(200).json("sending email ...");
+    // });
+
+    const mailOptions = {
+      from: process.env.NodeMailer_Email,
       to: `${findOrder.user}`,
       subject: "TeaBrand, Order Placed Successfully",
       text: "Thank you, Your order was placed successfully and we will prepare your package right away",
@@ -1173,10 +1224,14 @@ const orderConfirmedemail_post = async (req, res, next) => {
          `,
     };
 
-    mailgun.messages().send(data, function (error, body) {
-      // console.log(body);
-      // res.status(200).json("email sent");
-      res.status(200).json("sending email ...");
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+        return res.status(400).json("Error Sending mail");
+      } else {
+        console.log("Email sent: " + info.response);
+        return res.status(200).json("Email sent");
+      }
     });
   }
 

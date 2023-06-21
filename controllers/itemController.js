@@ -323,7 +323,7 @@ const deleteItem_post = async (req, res) => {
     // fs.unlink('./server/upload/my.csv',function(err){
     fs.unlink(filepathLocation, function (err) {
       if (err) console.log(err);
-      console.log("file deleted successfully");
+      // console.log("file deleted successfully");
     });
 
     // fs.unlink(filepathLocation),
